@@ -264,12 +264,12 @@ update_script() {
 							if [[ -f $MODDIR/app_details ]]; then
 								mv "$MODDIR/tools" "${MODDIR%/*}"
 								echoRgb "更新當前${MODDIR##*/}目錄下恢復相關腳本+外部tools目錄與腳本"
-								cp -r "$tools_path/script/Get_DirName" "${MODDIR%/*}/重新生成應用列表.sh"
-								cp -r "$tools_path/script/convert" "${MODDIR%/*}/轉換資料夾名稱.sh"
-								cp -r "$tools_path/script/check_file" "${MODDIR%/*}/壓縮檔完整性檢查.sh"
-								cp -r "$tools_path/script/restore" "${MODDIR%/*}/恢復備份.sh"
-								cp -r "$MODDIR/終止腳本.sh" "${MODDIR%/*}/終止腳本.sh"
-								[[ -d ${MODDIR%/*}/Media ]] && cp -r "$tools_path/script/restore3" "${MODDIR%/*}/恢復自定義資料夾.sh"
+								cp -r "$tools_path/script/Get_DirName" "${MODDIR%/*}/regen_applist.sh"
+								cp -r "$tools_path/script/convert" "${MODDIR%/*}/convert.sh"
+								cp -r "$tools_path/script/check_file" "${MODDIR%/*}/checksum.sh"
+								cp -r "$tools_path/script/restore" "${MODDIR%/*}/restore.sh"
+								cp -r "$MODDIR/terminate.sh" "${MODDIR%/*}/terminate.sh"
+								[[ -d ${MODDIR%/*}/Media ]] && cp -r "$tools_path/script/restore3" "${MODDIR%/*}/restore_media.sh"
 								find "${MODDIR%/*}" -maxdepth 1 -type d | sort | while read; do
 									if [[ -f $REPLY/app_details ]]; then
 										unset PackageName
@@ -285,21 +285,21 @@ update_script() {
 										fi
 									fi
 								done
-								if [[ -d ${MODDIR%/*/*}/tools && -f ${MODDIR%/*/*}/備份應用.sh ]]; then
+								if [[ -d ${MODDIR%/*/*}/tools && -f ${MODDIR%/*/*}/backup.sh ]]; then
 									echoRgb "更新${MODDIR%/*/*}/tools與備份相關腳本"
 									rm -rf "${MODDIR%/*/*}/tools"
 									find "${MODDIR%/*/*}" -maxdepth 1 -name "*.sh" -type f -exec rm -rf {} \;
-									mv "$MODDIR/備份應用.sh" "$MODDIR/生成應用列表.sh" "$MODDIR/備份自定義資料夾.sh" "$MODDIR/終止腳本.sh" "${MODDIR%/*/*}"
+									mv "$MODDIR/backup.sh" "$MODDIR/gen_applist.sh" "$MODDIR/backup_media.sh" "$MODDIR/terminate.sh" "${MODDIR%/*/*}"
 									cp -r "$tools_path" "${MODDIR%/*/*}"
 								fi
-								rm -rf "$MODDIR/終止腳本.sh"
+								rm -rf "$MODDIR/terminate.sh"
 							else
 								echoRgb "更新當前${MODDIR##*/}目錄下恢復相關腳本+tools目錄"
-								cp -r "$tools_path/script/Get_DirName" "$MODDIR/重新生成應用列表.sh"
-								cp -r "$tools_path/script/convert" "$MODDIR/轉換資料夾名稱.sh"
-								cp -r "$tools_path/script/check_file" "$MODDIR/壓縮檔完整性檢查.sh"
-								cp -r "$tools_path/script/restore" "$MODDIR/恢復備份.sh"
-								[[ -d $MODDIR/Media ]] && cp -r "$tools_path/script/restore3" "$MODDIR/恢復自定義資料夾.sh"
+								cp -r "$tools_path/script/Get_DirName" "$MODDIR/regen_applist.sh"
+								cp -r "$tools_path/script/convert" "$MODDIR/convert.sh"
+								cp -r "$tools_path/script/check_file" "$MODDIR/checksum.sh"
+								cp -r "$tools_path/script/restore" "$MODDIR/restore.sh"
+								[[ -d $MODDIR/Media ]] && cp -r "$tools_path/script/restore3" "$MODDIR/restore_media.sh"
 								find "$MODDIR" -maxdepth 1 -type d | sort | while read; do
 									if [[ -f $REPLY/app_details ]]; then
 										unset PackageName
@@ -315,15 +315,15 @@ update_script() {
 										fi
 									fi
 								done
-								if [[ -d ${MODDIR%/*}/tools && -f ${MODDIR%/*}/備份應用.sh ]]; then
+								if [[ -d ${MODDIR%/*}/tools && -f ${MODDIR%/*}/backup.sh ]]; then
 									echoRgb "更新${MODDIR%/*}/tools與備份相關腳本"
 									rm -rf "${MODDIR%/*}/tools"
 									find "${MODDIR%/*}" -maxdepth 1 -name "*.sh" -type f -exec rm -rf {} \;
-									cp -r "$MODDIR/備份應用.sh" "$MODDIR/終止腳本.sh" "$MODDIR/生成應用列表.sh" "$MODDIR/備份自定義資料夾.sh" "${MODDIR%/*}"
+									cp -r "$MODDIR/backup.sh" "$MODDIR/terminate.sh" "$MODDIR/gen_applist.sh" "$MODDIR/backup_media.sh" "${MODDIR%/*}"
 									cp -r "$tools_path" "${MODDIR%/*}"
 								fi
 							fi
-							rm -rf "$MODDIR/備份自定義資料夾.sh" "$MODDIR/生成應用列表.sh" "$MODDIR/備份應用.sh" "$tools_path/script"
+							rm -rf "$MODDIR/backup_media.sh" "$MODDIR/gen_applist.sh" "$MODDIR/backup.sh" "$tools_path/script"
 							;;
 						*)
 							if [[ $(find "$MODDIR" -maxdepth 1 -name "Backup_*" -type d) != "" ]]; then
@@ -332,12 +332,12 @@ update_script() {
 										echoRgb "更新當前目錄下備份相關腳本&tools目錄+${backup_path##*/}內tools目錄+恢復腳本+tools"
 										rm -rf "$backup_path/tools"
 										cp -r "$tools_path" "$backup_path" && rm -rf "$backup_path/tools/bin/zip" "$backup_path/tools/script"
-										cp -r "$tools_path/script/restore" "$backup_path/恢復備份.sh"
-										cp -r "$tools_path/script/Get_DirName" "$backup_path/重新生成應用列表.sh"
-										cp -r "$tools_path/script/convert" "$backup_path/轉換資料夾名稱.sh"
-										cp -r "$tools_path/script/check_file" "$backup_path/壓縮檔完整性檢查.sh"
-										cp -r "$MODDIR/終止腳本.sh" "$backup_path/終止腳本.sh"
-										[[ -d $backup_path/Media ]] && cp -r "$tools_path/script/restore3" "$backup_path/恢復自定義資料夾.sh"
+										cp -r "$tools_path/script/restore" "$backup_path/restore.sh"
+										cp -r "$tools_path/script/Get_DirName" "$backup_path/regen_applist.sh"
+										cp -r "$tools_path/script/convert" "$backup_path/convert.sh"
+										cp -r "$tools_path/script/check_file" "$backup_path/checksum.sh"
+										cp -r "$MODDIR/terminate.sh" "$backup_path/terminate.sh"
+										[[ -d $backup_path/Media ]] && cp -r "$tools_path/script/restore3" "$backup_path/restore_media.sh"
 										find "$MODDIR" -maxdepth 2 -type d | sort | while read; do
 											if [[ -f $REPLY/app_details ]]; then
 												unset PackageName
@@ -1166,11 +1166,11 @@ backup)
 	#數據目錄
 	txt="$MODDIR/appList.txt"
 	txt="${txt/'/storage/emulated/'/'/data/media/'}"
-	[[ ! -f $txt ]] && echoRgb "請執行\"生成應用列表.sh\"獲取應用列表再來備份" "0" && exit 1
+	[[ ! -f $txt ]] && echoRgb "請執行\"gen_applist.sh\"獲取應用列表再來備份" "0" && exit 1
 	sort -u "$txt" -o "$txt" 2>/dev/null
 	data="$MODDIR"
 	hx="本地"
-	echoRgb "提示 腳本支持後台壓縮 可以直接離開腳本\n -或是關閉終端也能備份 如需終止腳本\n -請執行終止腳本.sh即可停止\n -備份結束將發送toast提示語" "3"
+	echoRgb "提示 腳本支持後台壓縮 可以直接離開腳本\n -或是關閉終端也能備份 如需終止腳本\n -請執行terminate.sh即可停止\n -備份結束將發送toast提示語" "3"
 	backup_path
 	echoRgb "配置詳細:\n -壓縮方式:$Compression_method\n -音量鍵確認:$Lo\n -Toast:$toast_info\n -更新:$update\n -已卸載應用檢查:$delete_folder\n -卸載應用默認操作(true刪除false移動):$default_behavior\n -默認使用usb:$USBdefault\n -備份外部數據:$Backup_obb_data\n -備份user數據:$Backup_user_data\n -自定義目錄備份:$backup_media"
 	D="1"
@@ -1193,11 +1193,11 @@ backup)
 									mv "$REPLY" "$Backup/被卸載的應用/"
 								fi
 								[[ ! -d $Backup/被卸載的應用/tools ]] && cp -r "$tools_path" "$Backup/被卸載的應用" && rm -rf "$Backup/被卸載的應用/tools/bin/zip" "$Backup/被卸載的應用/tools/script"
-								[[ ! -f $Backup/被卸載的應用/恢復備份.sh ]] && cp -r "$script_path/restore" "$Backup/被卸載的應用/恢復備份.sh"
-								[[ ! -f $Backup/被卸載的應用/重新生成應用列表.sh ]] && cp -r "$script_path/Get_DirName" "$Backup/被卸載的應用/重新生成應用列表.sh"
-								[[ ! -f $Backup/被卸載的應用/轉換資料夾名稱.sh ]] && cp -r "$script_path/convert" "$Backup/被卸載的應用/轉換資料夾名稱.sh"
-								[[ ! -f $Backup/被卸載的應用/壓縮檔完整性檢查.sh ]] && cp -r "$script_path/check_file" "$Backup/被卸載的應用/壓縮檔完整性檢查.sh"
-								[[ ! -f $Backup/被卸載的應用/終止腳本.sh ]] && cp -r "$MODDIR/終止腳本.sh" "$Backup/被卸載的應用/終止腳本.sh"
+								[[ ! -f $Backup/被卸載的應用/restore.sh ]] && cp -r "$script_path/restore" "$Backup/被卸載的應用/restore.sh"
+								[[ ! -f $Backup/被卸載的應用/regen_applist.sh ]] && cp -r "$script_path/Get_DirName" "$Backup/被卸載的應用/regen_applist.sh"
+								[[ ! -f $Backup/被卸載的應用/convert.sh ]] && cp -r "$script_path/convert" "$Backup/被卸載的應用/convert.sh"
+								[[ ! -f $Backup/被卸載的應用/checksum.sh ]] && cp -r "$script_path/check_file" "$Backup/被卸載的應用/checksum.sh"
+								[[ ! -f $Backup/被卸載的應用/terminate.sh ]] && cp -r "$MODDIR/terminate.sh" "$Backup/被卸載的應用/terminate.sh"
 								[[ ! -f $Backup/被卸載的應用/backup_settings.conf ]] && echo "#1開啟0關閉\n\n#是否在每次執行恢復腳本時使用音量鍵詢問如下需求\n#如果是那下面兩項項設置就被忽略，改為音量鍵選擇\nLo=$Lo\n\n#備份與恢復遭遇異常或是結束後發送通知(toast與狀態欄提示)\ntoast_info=$toast_info\n\n#腳本檢測更新後進行更新?\nupdate=$update\n\n#檢測到更新後的行為(1跳轉瀏覽器 0不跳轉瀏覽器，但是複製連結到剪裁版)\nupdate_behavior=$update_behavior\n#主色\nrgb_a=$rgb_a\n#輔色\nrgb_b=$rgb_b\nrgb_c=$rgb_c">"$Backup/backup_settings.conf" && echo "$(sed 's/true/1/g ; s/false/0/g' "$Backup/backup_settings.conf")">"$Backup/被卸載的應用/backup_settings.conf" && echo "$(sed 's/true/1/g ; s/false/0/g' "$Backup/backup_settings.conf")">"$Backup/被卸載的應用/backup_settings.conf"
 								txt2="$Backup/被卸載的應用/appList.txt"
 								[[ ! -f $txt2 ]] && echo "#不需要恢復還原的應用請在開頭注釋# 比如#xxxxxxxx 酷安">"$txt2"
@@ -1226,7 +1226,7 @@ backup)
 	fi
 	r="$(grep -v "#" "$txt" | sed -e '/^$/d' | sed -n '$=')"
 	[[ $1 != "" ]] && r=1
-	[[ $r = "" ]] && echoRgb "$MODDIR_NAME/appList.txt是空的或是包名被注釋備份個鬼\n -檢查是否注釋亦或者執行$MODDIR_NAME/生成應用列表.sh" "0" && exit 1
+	[[ $r = "" ]] && echoRgb "$MODDIR_NAME/appList.txt是空的或是包名被注釋備份個鬼\n -檢查是否注釋亦或者執行$MODDIR_NAME/gen_applist.sh" "0" && exit 1
 	[[ $Backup_user_data = false ]] && echoRgb "當前$MODDIR_NAME/backup_settings.conf的\n -Backup_user_data=0將不備份user數據" "0"
 	[[ $Backup_obb_data = false ]] && echoRgb "當前$MODDIR_NAME/backup_settings.conf的\n -Backup_obb_data=0將不備份外部數據" "0"
 	[[ $backup_media = false ]] && echoRgb "當前$MODDIR_NAME/backup_settings.conf的\n -backup_media=0將不備份自定義資料夾" "0"
@@ -1234,13 +1234,13 @@ backup)
 	txt2="$Backup/appList.txt"
 	[[ ! -f $txt2 ]] && echo "#不需要恢復還原的應用請在開頭注釋# 比如#xxxxxxxx 酷安">"$txt2"
 	[[ ! -d $Backup/tools ]] && cp -r "$tools_path" "$Backup" && rm -rf "$Backup/tools/bin/zip" "$Backup/tools/script"
-	[[ ! -f $Backup/恢復備份.sh ]] && cp -r "$script_path/restore" "$Backup/恢復備份.sh"
-	[[ ! -f $Backup/終止腳本.sh ]] && cp -r "$MODDIR/終止腳本.sh" "$Backup/終止腳本.sh"
-	[[ ! -f $Backup/重新生成應用列表.sh ]] && cp -r "$script_path/Get_DirName" "$Backup/重新生成應用列表.sh"
-	[[ ! -f $Backup/轉換資料夾名稱.sh ]] && cp -r "$script_path/convert" "$Backup/轉換資料夾名稱.sh"
-	[[ ! -f $Backup/壓縮檔完整性檢查.sh ]] && cp -r "$script_path/check_file" "$Backup/壓縮檔完整性檢查.sh"
+	[[ ! -f $Backup/restore.sh ]] && cp -r "$script_path/restore" "$Backup/restore.sh"
+	[[ ! -f $Backup/terminate.sh ]] && cp -r "$MODDIR/terminate.sh" "$Backup/terminate.sh"
+	[[ ! -f $Backup/regen_applist.sh ]] && cp -r "$script_path/Get_DirName" "$Backup/regen_applist.sh"
+	[[ ! -f $Backup/convert.sh ]] && cp -r "$script_path/convert" "$Backup/convert.sh"
+	[[ ! -f $Backup/checksum.sh ]] && cp -r "$script_path/check_file" "$Backup/checksum.sh"
 	[[ ! -d $Backup/modules ]] && mkdir -p "$Backup/modules" && echoRgb "$Backup/modules已創建成功\n -請按需要自行放置需要恢復時刷入的模塊在內將自動批量刷入" "1"
-	[[ -d $Backup/Media ]] && cp -r "$script_path/restore3" "$Backup/恢復自定義資料夾.sh"
+	[[ -d $Backup/Media ]] && cp -r "$script_path/restore3" "$Backup/restore_media.sh"
 	[[ ! -f $Backup/backup_settings.conf ]] && echo "#1開啟0關閉\n\n#是否在每次執行恢復腳本時使用音量鍵詢問如下需求\n#如果是那下面兩項項設置就被忽略，改為音量鍵選擇\nLo=$Lo\n\n#備份與恢復遭遇異常或是結束後發送通知(toast與狀態欄提示)\ntoast_info=$toast_info\n\n#使用者\nuser=\n\n#腳本檢測更新後進行更新?\nupdate=$update\n\n#檢測到更新後的行為(1跳轉瀏覽器 0不跳轉瀏覽器，但是複製連結到剪裁版)\nupdate_behavior=$update_behavior\n\n#主色\nrgb_a=$rgb_a\n#輔色\nrgb_b=$rgb_b\nrgb_c=$rgb_c">"$Backup/backup_settings.conf" && echo "$(sed 's/true/1/g ; s/false/0/g' "$Backup/backup_settings.conf")">"$Backup/backup_settings.conf"
 	filesha256="$(sha256sum "$bin_path/tools.sh" | cut -d" " -f1)"
 	filesha256_1="$(sha256sum "$Backup/tools/bin/tools.sh" | cut -d" " -f1)"
@@ -1361,7 +1361,7 @@ backup)
 					echoRgb "備份結束，備份多媒體" "1"
 					starttime1="$(date -u "+%s")"
 					Backup_folder="$Backup/Media"
-					[[ ! -f $Backup/恢復自定義資料夾.sh ]] && cp -r "$script_path/restore3" "$Backup/恢復自定義資料夾.sh"
+					[[ ! -f $Backup/restore_media.sh ]] && cp -r "$script_path/restore3" "$Backup/restore_media.sh"
 					[[ ! -d $Backup_folder ]] && mkdir -p "$Backup_folder"
 					app_details="$Backup_folder/app_details"
 					[[ -f $app_details ]] && . "$app_details" &>/dev/null || touch "$app_details"
@@ -1423,16 +1423,16 @@ check_file)
 Restore)
 	kill_Serve
 	self_test
-	echoRgb "假設反悔了要終止腳本請儘速離開此腳本點擊$MODDIR_NAME/終止腳本.sh\n -否則腳本將繼續執行直到結束" "0"
-	echoRgb "如果大量提示找不到資料夾請執行$MODDIR_NAME/轉換資料夾名稱.sh"
+	echoRgb "假設反悔了要終止腳本請儘速離開此腳本點擊$MODDIR_NAME/terminate.sh\n -否則腳本將繼續執行直到結束" "0"
+	echoRgb "如果大量提示找不到資料夾請執行$MODDIR_NAME/convert.sh"
 	disable_verify
 	[[ ! -d $path2 ]] && echoRgb "設備不存在user目錄" "0" && exit 1
 	i=1
 	txt="$MODDIR/appList.txt"
-	[[ ! -f $txt ]] && echoRgb "請執行\"重新生成應用列表.sh\"獲取應用列表再來恢復" "0" && exit 2
+	[[ ! -f $txt ]] && echoRgb "請執行\"regen_applist.sh\"獲取應用列表再來恢復" "0" && exit 2
 	sort -u "$txt" -o "$txt" 2>/dev/null
 	r="$(grep -v "#" "$txt" | sed -e '/^$/d' | sed -n '$=')"
-	[[ $r = "" ]] && echoRgb "appList.txt包名為空或是被注釋了\n -請執行\"重新生成應用列表.sh\"獲取應用列表再來恢復" "0" && exit 1
+	[[ $r = "" ]] && echoRgb "appList.txt包名為空或是被注釋了\n -請執行\"regen_applist.sh\"獲取應用列表再來恢復" "0" && exit 1
 	Backup_folder2="$MODDIR/Media"
 	Backup_folder3="$MODDIR/modules"
 	#效驗選填是否正確
@@ -1541,7 +1541,7 @@ Restore)
 			    sort -u "$txt" -o "$txt" 2>/dev/null
 			    A=1
 	            B="$(grep -v "#" "$txt" 2>/dev/null | sed -e '/^$/d' | sed -n '$=')"
-                [[ $B = "" ]] && echoRgb "mediaList.txt壓縮包名為空或是被注釋了\n -請執行\"重新生成應用列表.sh\"獲取列表再來恢復" "0" && B=0
+                [[ $B = "" ]] && echoRgb "mediaList.txt壓縮包名為空或是被注釋了\n -請執行\"regen_applist.sh\"獲取列表再來恢復" "0" && B=0
 				while [[ $A -le $B ]]; do
 		            name1="$(grep -v "#" "$txt" | sed -e '/^$/d' | sed -n "${A}p" | awk '{print $1}')"
 		            starttime2="$(date -u "+%s")"
@@ -1628,14 +1628,14 @@ Restore3)
 	kill_Serve
 	self_test
 	echoRgb "點錯了?這是恢復自定義資料夾腳本 如果你是要恢復應用那你就點錯了\n -音量上繼續恢復自定義資料夾，音量下離開腳本" "2"
-	echoRgb "假設反悔了要終止腳本請儘速離開此腳本點擊終止腳本.sh,否則腳本將繼續執行直到結束" "0"
+	echoRgb "假設反悔了要終止腳本請儘速離開此腳本點擊terminate.sh,否則腳本將繼續執行直到結束" "0"
 	get_version "恢復自定義資料夾" "離開腳本" && [[ "$branch" = false ]] && exit 0
 	mediaDir="$MODDIR/Media"
 	[[ -f "$mediaDir/app_details" ]] && app_details="$mediaDir/app_details" &>/dev/null
 	Backup_folder2="$mediaDir"
 	[[ ! -d $mediaDir ]] && echoRgb "媒體資料夾不存在" "0" && exit 2
 	txt="$MODDIR/mediaList.txt"
-	[[ ! -f $txt ]] && echoRgb "請執行\"重新生成應用列表.sh\"獲取媒體列表再來恢復" "0" && exit 2
+	[[ ! -f $txt ]] && echoRgb "請執行\"regen_applist.sh\"獲取媒體列表再來恢復" "0" && exit 2
 	sort -u "$txt" -o "$txt" 2>/dev/null
 	#記錄開始時間
 	starttime1="$(date -u "+%s")"
@@ -1649,7 +1649,7 @@ Restore3)
 	starttime1="$(date -u "+%s")"
 	A=1
 	B="$(grep -v "#" "$txt" | sed -e '/^$/d' | sed -n '$=')"
-	[[ $B = "" ]] && echoRgb "mediaList.txt壓縮包名為空或是被注釋了\n -請執行\"重新生成應用列表.sh\"獲取列表再來恢復" "0" && exit 1
+	[[ $B = "" ]] && echoRgb "mediaList.txt壓縮包名為空或是被注釋了\n -請執行\"regen_applist.sh\"獲取列表再來恢復" "0" && exit 1
 	echo "$script">"$TMPDIR/scriptTMP"
 	{
 	while [[ $A -le $B ]]; do
@@ -1762,17 +1762,17 @@ backup_media)
 	kill_Serve
 	self_test
 	backup_path
-	echoRgb "假設反悔了要終止腳本請儘速離開此腳本點擊終止腳本.sh,否則腳本將繼續執行直到結束" "0"
+	echoRgb "假設反悔了要終止腳本請儘速離開此腳本點擊terminate.sh,否則腳本將繼續執行直到結束" "0"
 	A=1
 	B="$(echo "$Custom_path" | grep -v "#" | sed -e '/^$/d' | sed -n '$=')"
 	if [[ $B != "" ]]; then
 		starttime1="$(date -u "+%s")"
 		Backup_folder="$Backup/Media"
 		[[ ! -d $Backup_folder ]] && mkdir -p "$Backup_folder"
-		[[ ! -f $Backup/恢復自定義資料夾.sh ]] && cp -r "$script_path/restore3" "$Backup/恢復自定義資料夾.sh"
-		[[ ! -f $Backup/重新生成應用列表.sh ]] && cp -r "$script_path/Get_DirName" "$Backup/重新生成應用列表.sh"
-		[[ ! -f $Backup/轉換資料夾名稱.sh ]] && cp -r "$script_path/convert" "$Backup/轉換資料夾名稱.sh"
-		[[ ! -f $Backup/壓縮檔完整性檢查.sh ]] && cp -r "$script_path/check_file" "$Backup/壓縮檔完整性檢查.sh"
+		[[ ! -f $Backup/restore_media.sh ]] && cp -r "$script_path/restore3" "$Backup/restore_media.sh"
+		[[ ! -f $Backup/regen_applist.sh ]] && cp -r "$script_path/Get_DirName" "$Backup/regen_applist.sh"
+		[[ ! -f $Backup/convert.sh ]] && cp -r "$script_path/convert" "$Backup/convert.sh"
+		[[ ! -f $Backup/checksum.sh ]] && cp -r "$script_path/check_file" "$Backup/checksum.sh"
 		[[ ! -d $Backup/tools ]] && cp -r "$tools_path" "$Backup" && rm -rf "$Backup/tools/bin/zip" "$Backup/tools/script"
 		[[ ! -f $Backup/backup_settings.conf ]] && echo "#1開啟0關閉\n\n#是否在每次執行恢復腳本時使用音量鍵詢問如下需求\n#如果是那下面兩項項設置就被忽略，改為音量鍵選擇\nLo=$Lo\n\n#備份與恢復遭遇異常或是結束後發送通知(toast與狀態欄提示)\ntoast_info=$toast_info\n\n#使用者\nuser=\n\n#腳本檢測更新後進行更新?\nupdate=$update\n\n#檢測到更新後的行為(1跳轉瀏覽器 0不跳轉瀏覽器，但是複製連結到剪裁版)\nupdate_behavior=$update_behavior\n#主色\nrgb_a=$rgb_a\n#輔色\nrgb_b=$rgb_b\nrgb_c=$rgb_c">"$Backup/backup_settings.conf" && echo "$(sed 's/true/1/g ; s/false/0/g' "$Backup/backup_settings.conf")">"$Backup/backup_settings.conf"
 		app_details="$Backup_folder/app_details"
